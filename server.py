@@ -14,12 +14,12 @@ counterMessagesRecv = 0
 counterMessagesSent = 0
 sock = socket.socket(socket.AF_INET,socket.SOCK_DGRAM)
 sock.bind((UDP_IP, UDP_PORT))
-I = 0
+I = 1
 
 def broadcast(data,addr):
       global counterMessagesSent
       for k, v in CONNECTED_PLAYERS.iteritems():
-            if k != str(addr):
+            if v != addr:
                 sock.sendto(data,v)
                 counterMessagesSent += 1
                 print "Broadcasted position/score/object to network" + str(v)
@@ -31,21 +31,31 @@ def reply(data,addr):
       print "Replied data to player"
 
 while True:
-    if (len(AVAILABLE_PLAYER_IDS) == 0) :
-      if (len(OBJECTS) < 2):
-        print "All players has connected! Start spawning objects"
-        x = 1.1 + random.uniform(-54.12668*0.8,54.12668*0.8) # center point(x) + random (+-width* 0.8) 
-        y = 47.4 + random.uniform(-53.18718*0.8,53.18718*0.8) # center point(y) + random (+-height* 0.8) 
-        z = 59.8 + random.uniform(-53.86607*0.8,-53.86607*0.8) # center point(z) + random (+-length* 0.8) 
-        I+=1
-        objectName = "Key" + str(I)
-        print "Object ",objectName," generated for player at: <", x, y, z, ">" # got coordinates x,y,z of objects
-        OBJECTS[objectName] = 1
-        objectLocation = "objectLocation," + objectName + "," + str(x) + "," + str(y) + "," + str(z)
-        sock.sendto(objectLocation,CONNECTED_PLAYERS["Player1"])
-        print "Object location sent to ", CONNECTED_PLAYERS["Player1"]
-        sock.sendto(objectLocation,CONNECTED_PLAYERS["Player2"])
-        print "Object location sent to ", CONNECTED_PLAYERS["Player2"]
+    if (len(CONNECTED_PLAYERS) == 2):
+      if (len(AVAILABLE_PLAYER_IDS) == 0):
+          if (len(OBJECTS) < 10):
+            print "All players has connected! Start spawning objects"
+            x = 1.1 + random.uniform(-54.12668*0.8,54.12668*0.8) # center point(x) + random (+-width* 0.8) 
+            y = 47.4 + random.uniform(-53.18718*0.8,53.18718*0.8) # center point(y) + random (+-height* 0.8) 
+            z = 59.8 + random.uniform(-53.86607*0.8,-53.86607*0.8) # center point(z) + random (+-length* 0.8)
+            x1 = 1.1 + random.uniform(-54.12668*0.8,54.12668*0.8) # center point(x) + random (+-width* 0.8) 
+            y1 = 47.4 + random.uniform(-53.18718*0.8,53.18718*0.8) # center point(y) + random (+-height* 0.8) 
+            z1 = 59.8 + random.uniform(-53.86607*0.8,-53.86607*0.8) # center point(z) + random (+-length* 0.8)
+            objectName = "Key" + str(I)
+            objectName1 = "Key" + str(I+1)
+            print "Object ",objectName," generated for player at: <", x, y, z, ">" # got coordinates x,y,z of objects
+            print "Object ",objectName1," generated for player at: <", x1, y1, z1, ">" # got coordinates x,y,z of objects
+            OBJECTS[objectName] = 1
+            OBJECTS[objectName1] = 1
+            objectLocation = "objectLocation," + objectName + "," + str(x) + "," + str(y) + "," + str(z)
+            objectLocation1 = "objectLocation1," + objectName1 + "," + str(x1) + "," + str(y1) + "," + str(z1) 
+            sock.sendto(objectLocation,CONNECTED_PLAYERS["Player1"])
+            sock.sendto(objectLocation,CONNECTED_PLAYERS["Player2"])
+            print "Object",objectName," location sent to ", CONNECTED_PLAYERS["Player1"] , " and ", CONNECTED_PLAYERS["Player2"]
+            sock.sendto(objectLocation1,CONNECTED_PLAYERS["Player1"])
+            sock.sendto(objectLocation1,CONNECTED_PLAYERS["Player2"])
+            print "Object",objectName1," location sent to ", CONNECTED_PLAYERS["Player1"] , " and ", CONNECTED_PLAYERS["Player2"]
+            I+=2
     buf = bytearray(1024)
     nbytes, addr = sock.recvfrom_into(buf) # get the size of the received UDP packet
     try:
@@ -114,15 +124,32 @@ while True:
       if command[0] == 'request_scores':
           print "Score request received"
           print ""
-          scorestr = "score," + str(int(PLAYER_SCORE["Player1"])) + "," + str(int(PLAYER_SCORE["Player2"])) 
-          reply(scorestr,addr)
+          if (len(PLAYER_SCORE) == 2):
+              if (PLAYER_SCORE["Player1"] == 20):
+                  data = "winner," + "Player1," +  str(int(PLAYER_SCORE["Player1"])) + "," + str(int(PLAYER_SCORE["Player2"]))
+                  sock.sendto(data,CONNECTED_PLAYERS["Player1"])
+                  sock.sendto(data,CONNECTED_PLAYERS["Player2"])
+                  print "We found a winner!"
+                  print data
+              elif (PLAYER_SCORE["Player2"] == 20):
+                  data = "winner," + "Player2," +  str(int(PLAYER_SCORE["Player1"])) + "," + str(int(PLAYER_SCORE["Player2"]))
+                  sock.sendto(data,CONNECTED_PLAYERS["Player1"])
+                  sock.sendto(data,CONNECTED_PLAYERS["Player2"])
+                  print "We found a winner!"
+                  print data
+              else :
+                  scorestr = "score," + str(int(PLAYER_SCORE["Player1"])) + "," + str(int(PLAYER_SCORE["Player2"])) 
+                  reply(scorestr,addr)
       if command[0] == 'object_destroyed1':
           print "Event request received"
           objectID = str(command[1]).rstrip('\x00') # remove all \x00 from string
           playerID = str(command[2]).rstrip('\x00') # remove all \x00 from string
-          PLAYER_SCORE[playerID] += 1
+          for k, v in OBJECTS.items():
+            if k == objectID:
+              PLAYER_SCORE[playerID] += 1
+              del OBJECTS[objectID]
+          print OBJECTS
           print "The score of ", playerID, " increased by 1"
-          del OBJECTS[objectID]
           data = "objectDestroyed1," + objectID + "," + playerID
           sock.sendto(data,CONNECTED_PLAYERS["Player2"])
           print "Object destroyed command send to Player 2"
@@ -130,9 +157,12 @@ while True:
           print "Event request received"
           objectID = str(command[1]).rstrip('\x00') # remove all \x00 from string
           playerID = str(command[2]).rstrip('\x00') # remove all \x00 from string
-          PLAYER_SCORE[playerID] += 1
+          for k, v in OBJECTS.items():
+            if k == objectID:
+              PLAYER_SCORE[playerID] += 1
+              del OBJECTS[objectID]
+          print OBJECTS
           print "The score of ", playerID, " increased by 1"
-          del OBJECTS[objectID]
           data = "objectDestroyed2," + objectID + "," + playerID
           sock.sendto(data,CONNECTED_PLAYERS["Player1"])
           print "Object destroyed command send to Player 1"

@@ -4,8 +4,9 @@ using UnityEngine;
 
 public class CollisionTest : MonoBehaviour {
 
-	// Use this for initialization
-	void Start () {
+    public AudioClip triggerSound;
+    // Use this for initialization
+    void Start () {
 	}
 	
 	// Update is called once per frame
@@ -14,8 +15,9 @@ public class CollisionTest : MonoBehaviour {
 
     void OnTriggerEnter(Collider other)
     {
+        AudioSource.PlayClipAtPoint(triggerSound, transform.position);
         Debug.Log(gameObject.name + " was triggered by " + other.gameObject.name);
-        DestroyObject(gameObject);
-        CustomNetwork.instance.SendObjectDestroyedMsg(gameObject.name.ToString().Trim(),other.gameObject.name.ToString().Trim());
+        DestroyObject(gameObject); // destroy that object
+        CustomNetwork.instance.SendObjectDestroyedMsg(gameObject.name.ToString().Trim(), other.gameObject.name.ToString().Trim());
     }
 }
