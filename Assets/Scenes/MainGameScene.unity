@@ -2410,13 +2410,12 @@ CharacterController:
 --- !u!114 &2088481348
 MonoBehaviour:
   m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 114857834970863604, guid: 404b1b9ac68fe1840a075bbf4a550ec2,
-    type: 2}
+  m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 2088481346}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7998b0d7c2af5f24db1683a54d7ff97a, type: 3}
+  m_Script: {fileID: 11500000, guid: 8833d5816cb16de4fa4bfbaaf72eaace, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   VRCamera: {fileID: 1981680714}
@@ -2570,13 +2569,12 @@ CharacterController:
 --- !u!114 &2090592563
 MonoBehaviour:
   m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 114857834970863604, guid: 404b1b9ac68fe1840a075bbf4a550ec2,
-    type: 2}
+  m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 2090592560}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7998b0d7c2af5f24db1683a54d7ff97a, type: 3}
+  m_Script: {fileID: 11500000, guid: 896385f6039fc4d4daf51201891b2943, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   VRCamera: {fileID: 1620247935}

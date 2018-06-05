@@ -36,6 +36,8 @@ public class CustomNetwork : MonoBehaviour
     bool createObject = false;
     bool destroyObject = false;
     bool winner = false;
+    bool increaseSpeed1st = true;
+    bool increaseSpeed2nd = true;
     string LocalPlayerID = "0";
     bool Player1State = false;
     bool Player2State = false;
@@ -80,8 +82,6 @@ public class CustomNetwork : MonoBehaviour
             //Then destroy this. This enforces our singleton pattern, meaning there can only ever be one instance of a GameManager.
             Destroy(gameObject);
     }
-
-
 
     // Use this for initialization
     public void Start()
@@ -284,6 +284,28 @@ public class CustomNetwork : MonoBehaviour
             oy1 = y1;
             oz1 = z1;
             createObject = true;
+        }
+        else if (substrings[0].Equals("speed+"))
+        {
+            Debug.Log("Increase speed 1st command received");
+            if (increaseSpeed1st)
+            {
+                float x = (float)System.Convert.ToDouble(substrings[1]);
+                Player1Movement.player1Movement.IncreaseSpeed(x);
+                Player2Movement.player2Movement.IncreaseSpeed(x);
+                increaseSpeed1st = false;
+            }
+        }
+        else if (substrings[0].Equals("speed++"))
+        {
+            Debug.Log("Increase speed 2nd command received");
+            if (increaseSpeed2nd)
+            {
+                float x = (float)System.Convert.ToDouble(substrings[1]);
+                Player1Movement.player1Movement.IncreaseSpeed(x);
+                Player2Movement.player2Movement.IncreaseSpeed(x);
+                increaseSpeed2nd = false;
+            }
         }
         else if (substrings[0].Equals("winner"))
         {

@@ -1,0 +1,19 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: gamenet-deployment
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+         app: gamenet-app
+    spec:
+      containers:
+      - name: gamenet-app
+        image: docker.io/cegvinoth/gamenet
+        ports:
+        - containerPort: 44663
+          protocol: UDP
+      nodeSelector:
+        nodename: rpi3-5

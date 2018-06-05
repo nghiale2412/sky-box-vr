@@ -7,6 +7,7 @@ using UnityEngine.XR;
 public class WinnerMessage : MonoBehaviour {
 
     private Text txt;
+
     public static WinnerMessage winnerMessageInstance = null;
 
     void Awake()
